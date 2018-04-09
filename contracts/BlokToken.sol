@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.21;
 
 import './Ownable.sol';
 import './SafeMath.sol';
@@ -40,7 +40,7 @@ contract BlokToken is Ownable, BasicToken, TokenHolder {
         totalSupply = totalSupply.add(_amount);
         balances[_to] = balances[_to].add(_amount);
 
-        Transfer(0x0, _to, _amount);
+        emit Transfer(0x0, _to, _amount);
     }
 
     /// @dev End minting mode.
@@ -51,7 +51,7 @@ contract BlokToken is Ownable, BasicToken, TokenHolder {
 
         isMinting = false;
 
-        MintingEnded();
+        emit MintingEnded();
     }
 
     /// @dev Same ERC20 behavior, but reverts if still minting.

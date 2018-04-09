@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.21;
 
 /// @title Ownable
 /// @dev The Ownable contract has an owner address, and provides basic authorization control functions, this simplifies
@@ -12,7 +12,7 @@ contract Ownable {
 
     /// @dev The Ownable constructor sets the original `owner` of the contract to the sender
     /// account.
-    function Ownable() {
+    function Ownable() public {
         owner = msg.sender;
     }
 
@@ -40,7 +40,7 @@ contract Ownable {
 
         newOwnerCandidate = _newOwnerCandidate;
 
-        OwnershipRequested(msg.sender, newOwnerCandidate);
+        emit OwnershipRequested(msg.sender, newOwnerCandidate);
     }
 
     /// @dev Accept ownership transfer. This method needs to be called by the previously proposed owner.
@@ -50,6 +50,6 @@ contract Ownable {
         owner = newOwnerCandidate;
         newOwnerCandidate = address(0);
 
-        OwnershipTransferred(previousOwner, owner);
+        emit OwnershipTransferred(previousOwner, owner);
     }
 }

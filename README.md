@@ -12,6 +12,10 @@ Contracts are written in [Solidity][solidity] and tested using [Truffle][truffle
 
 ### Depenencies
 
+* node v9.11.1
+
+* npm 5.8.0
+
 ```bash
 # Install Truffle and testrpc packages globally:
 $ npm install -g truffle ethereumjs-testrpc

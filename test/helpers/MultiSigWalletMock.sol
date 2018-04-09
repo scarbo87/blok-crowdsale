@@ -1,11 +1,11 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.21;
 
 import '../../contracts/MultiSigWallet.sol';
 
 contract MultiSigWalletMock is MultiSigWallet {
     uint256 public transactionId;
 
-    function MultiSigWalletMock(address[] _owners, uint _required) MultiSigWallet(_owners, _required) {
+    function MultiSigWalletMock(address[] _owners, uint _required) MultiSigWallet(_owners, _required) public {
     }
 
     function submitTransaction(address _destination, uint _value, bytes _data) public returns (uint _transactionId) {

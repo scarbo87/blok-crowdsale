@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.21;
 
 import './SafeMath.sol';
 import './Ownable.sol';
@@ -94,7 +94,7 @@ contract BlokTokenSale is Ownable, TokenHolder {
     /// @dev Constructor that initializes the sale conditions.
     /// @param _fundingRecipient address The address of the funding recipient.
     /// @param _startTime uint256 The start time of the token sale.
-    function BlokTokenSale(address _fundingRecipient, uint256 _startTime) {
+    function BlokTokenSale(address _fundingRecipient, uint256 _startTime) public {
         require(_fundingRecipient != address(0));
         require(_startTime > now);
 
@@ -274,7 +274,7 @@ contract BlokTokenSale is Ownable, TokenHolder {
         // Request Blok token contract to mint the requested tokens for the buyer.
         blok.mint(_recipient, _tokens);
 
-        TokensIssued(_recipient, _tokens);
+        emit TokensIssued(_recipient, _tokens);
     }
 
     /// @dev Returns whether the sale has ended.

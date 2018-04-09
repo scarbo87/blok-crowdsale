@@ -1,4 +1,4 @@
-pragma solidity ^0.4.15;
+pragma solidity ^0.4.21;
 
 import './SafeMath.sol';
 import './Ownable.sol';
@@ -34,7 +34,7 @@ contract VestingTrustee is Ownable {
 
     /// @dev Constructor that initializes the address of the Blok token contract.
     /// @param _blok BlokToken The address of the previously deployed Blok token contract.
-    function VestingTrustee(BlokToken _blok) {
+    function VestingTrustee(BlokToken _blok) public {
         require(_blok != address(0));
 
         blok = _blok;
@@ -82,20 +82,20 @@ contract VestingTrustee is Ownable {
         // Since tokens have been granted, reduce the total amount available for vesting.
         totalVesting = totalVesting.add(_value);
 
-        NewGrant(msg.sender, _to, _value);
+        emit NewGrant(msg.sender, _to, _value);
     }
 
     /// @dev Revoke the grant of tokens of a specifed address.
     /// @param _holder The address which will have its tokens revoked.
     function revoke(address _holder) public onlyOwner {
-        Grant memory grant = grants[_holder];
+        Grant memory _grant = grants[_holder];
 
         // Grant must be revokable.
-        require(grant.revokable);
+        require(_grant.revokable);
 
         // Calculate amount of remaining tokens that are still available to be
         // returned to owner.
-        uint256 refund = grant.value.sub(grant.transferred);
+        uint256 refund = _grant.value.sub(_grant.transferred);
 
         // Remove grant information.
         delete grants[_holder];
@@ -104,7 +104,7 @@ contract VestingTrustee is Ownable {
         totalVesting = totalVesting.sub(refund);
         blok.transfer(msg.sender, refund);
 
-        GrantRevoked(_holder, refund);
+        emit GrantRevoked(_holder, refund);
     }
 
     /// @dev Calculate the total amount of vested tokens of a holder at a given time.
@@ -112,19 +112,19 @@ contract VestingTrustee is Ownable {
     /// @param _time uint256 The specific time to calculate against.
     /// @return a uint256 Representing a holder's total amount of vested tokens.
     function vestedTokens(address _holder, uint256 _time) external constant returns (uint256) {
-        Grant memory grant = grants[_holder];
-        if (grant.value == 0) {
+        Grant memory _grant = grants[_holder];
+        if (_grant.value == 0) {
             return 0;
         }
 
-        return calculateVestedTokens(grant, _time);
+        return calculateVestedTokens(_grant, _time);
     }
 
     /// @dev Calculate amount of vested tokens at a specifc time.
     /// @param _grant Grant The vesting grant.
     /// @param _time uint256 The time to be checked
     /// @return a uint256 Representing the amount of vested tokens of a specific grant.
-    function calculateVestedTokens(Grant _grant, uint256 _time) private constant returns (uint256) {
+    function calculateVestedTokens(Grant _grant, uint256 _time) private pure returns (uint256) {
         // If we're before the cliff, then nothing is vested.
         if (_time < _grant.cliff) {
             return 0;
@@ -150,28 +150,28 @@ contract VestingTrustee is Ownable {
     /// @dev Unlock vested tokens and transfer them to their holder.
     /// @return a uint256 Representing the amount of vested tokens transferred to their holder.
     function unlockVestedTokens() external {
-        Grant storage grant = grants[msg.sender];
+        Grant storage _grant = grants[msg.sender];
 
         // Require that there will be funds left in grant to tranfser to holder.
-        require(grant.value != 0);
+        require(_grant.value != 0);
 
         // Get the total amount of vested tokens, acccording to grant.
-        uint256 vested = calculateVestedTokens(grant, now);
+        uint256 vested = calculateVestedTokens(_grant, now);
         if (vested == 0) {
             return;
         }
 
         // Make sure the holder doesn't transfer more than what he already has.
-        uint256 transferable = vested.sub(grant.transferred);
+        uint256 transferable = vested.sub(_grant.transferred);
         if (transferable == 0) {
             return;
         }
 
         // Update transferred and total vesting amount, then transfer remaining vested funds to holder.
-        grant.transferred = grant.transferred.add(transferable);
+        _grant.transferred = _grant.transferred.add(transferable);
         totalVesting = totalVesting.sub(transferable);
         blok.transfer(msg.sender, transferable);
 
-        TokensUnlocked(msg.sender, transferable);
+        emit TokensUnlocked(msg.sender, transferable);
     }
 }

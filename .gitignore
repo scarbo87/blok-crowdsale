@@ -1,6 +1,7 @@
 /node_modules
 /build
 /.DS_Store
+/.idea
 /coverage
 /coverageEnv
 /coverage.json
